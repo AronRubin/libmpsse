@@ -3,49 +3,49 @@ import pylibmpsse as _mpsse
 MPSSE_OK = _mpsse.MPSSE_OK
 MPSSE_FAIL = _mpsse.MPSSE_FAIL
 
-MSB = _mpsse.MSB
-LSB = _mpsse.LSB
+MSB = _mpsse.MPSSE_MSB
+LSB = _mpsse.MPSSE_LSB
 
-ACK = _mpsse.ACK
-NACK = _mpsse.NACK
+ACK = _mpsse.MPSSE_ACK
+NACK = _mpsse.MPSSE_NACK
 
-SPI0 = _mpsse.SPI0
-SPI1 = _mpsse.SPI1
-SPI2 = _mpsse.SPI2
-SPI3 = _mpsse.SPI3
-I2C = _mpsse.I2C
-GPIO = _mpsse.GPIO
-BITBANG = _mpsse.BITBANG
+SPI0 = _mpsse.MPSSE_SPI0
+SPI1 = _mpsse.MPSSE_SPI1
+SPI2 = _mpsse.MPSSE_SPI2
+SPI3 = _mpsse.MPSSE_SPI3
+I2C = _mpsse.MPSSE_I2C
+GPIO = _mpsse.MPSSE_GPIO
+BITBANG = _mpsse.MPSSE_BITBANG
 
-GPIOL0 = _mpsse.GPIOL0
-GPIOL1 = _mpsse.GPIOL1
-GPIOL2 = _mpsse.GPIOL2
-GPIOL3 = _mpsse.GPIOL3
-GPIOH0 = _mpsse.GPIOH0
-GPIOH1 = _mpsse.GPIOH1
-GPIOH2 = _mpsse.GPIOH2
-GPIOH3 = _mpsse.GPIOH3
-GPIOH4 = _mpsse.GPIOH4
-GPIOH5 = _mpsse.GPIOH5
-GPIOH6 = _mpsse.GPIOH6
-GPIOH7 = _mpsse.GPIOH7
+GPIOL0 = _mpsse.MPSSE_GPIOL0
+GPIOL1 = _mpsse.MPSSE_GPIOL1
+GPIOL2 = _mpsse.MPSSE_GPIOL2
+GPIOL3 = _mpsse.MPSSE_GPIOL3
+GPIOH0 = _mpsse.MPSSE_GPIOH0
+GPIOH1 = _mpsse.MPSSE_GPIOH1
+GPIOH2 = _mpsse.MPSSE_GPIOH2
+GPIOH3 = _mpsse.MPSSE_GPIOH3
+GPIOH4 = _mpsse.MPSSE_GPIOH4
+GPIOH5 = _mpsse.MPSSE_GPIOH5
+GPIOH6 = _mpsse.MPSSE_GPIOH6
+GPIOH7 = _mpsse.MPSSE_GPIOH7
 
-IFACE_ANY = _mpsse.IFACE_ANY
-IFACE_A = _mpsse.IFACE_A
-IFACE_B = _mpsse.IFACE_B
-IFACE_C = _mpsse.IFACE_C
-IFACE_D = _mpsse.IFACE_D
+IFACE_ANY = _mpsse.MPSSE_IFACE_ANY
+IFACE_A = _mpsse.MPSSE_IFACE_A
+IFACE_B = _mpsse.MPSSE_IFACE_B
+IFACE_C = _mpsse.MPSSE_IFACE_C
+IFACE_D = _mpsse.MPSSE_IFACE_D
 
-ONE_HUNDRED_KHZ = _mpsse.ONE_HUNDRED_KHZ
-FOUR_HUNDRED_KHZ = _mpsse.FOUR_HUNDRED_KHZ
-ONE_MHZ = _mpsse.ONE_MHZ
-TWO_MHZ = _mpsse.TWO_MHZ
-FIVE_MHZ = _mpsse.FIVE_MHZ
-SIX_MHZ = _mpsse.SIX_MHZ
-TEN_MHZ = _mpsse.TEN_MHZ
-TWELVE_MHZ = _mpsse.TWELVE_MHZ
-FIFTEEN_MHZ = _mpsse.FIFTEEN_MHZ
-THIRTY_MHZ = _mpsse.THIRTY_MHZ
+ONE_HUNDRED_KHZ = _mpsse.MPSSE_ONE_HUNDRED_KHZ
+FOUR_HUNDRED_KHZ = _mpsse.MPSSE_FOUR_HUNDRED_KHZ
+ONE_MHZ = _mpsse.MPSSE_ONE_MHZ
+TWO_MHZ = _mpsse.MPSSE_TWO_MHZ
+FIVE_MHZ = _mpsse.MPSSE_FIVE_MHZ
+SIX_MHZ = _mpsse.MPSSE_SIX_MHZ
+TEN_MHZ = _mpsse.MPSSE_TEN_MHZ
+TWELVE_MHZ = _mpsse.MPSSE_TWELVE_MHZ
+FIFTEEN_MHZ = _mpsse.MPSSE_FIFTEEN_MHZ
+THIRTY_MHZ = _mpsse.MPSSE_THIRTY_MHZ
 
 class MPSSE(object):
 	"""
@@ -65,7 +65,7 @@ class MPSSE(object):
 		"""
 		self.context = None
 		if mode is not None:
-			self.context = _mpsse.MPSSE(mode, frequency, endianess)
+			self.context = _mpsse.mpsse_open_simple(mode, frequency, endianess)
 			if self.context.open == 0:
 				raise Exception(self.ErrorString())
 
@@ -98,7 +98,7 @@ class MPSSE(object):
 		Returns MPSSE_OK on success.
 		Raises an exeption on failure.
 		"""
-		self.context = _mpsse.OpenIndex(vid, pid, mode, frequency, endianess, interface, description, serial, index)
+		self.context = _mpsse.mpsse_open_index(vid, pid, mode, frequency, endianess, interface, description, serial, index)
 		if self.context.open == 0:
 			raise Exception(self.ErrorString())
 		return MPSSE_OK
@@ -109,14 +109,14 @@ class MPSSE(object):
 
 		Returns None.
 		"""
-		retval = _mpsse.Close(self.context)
+		retval = _mpsse.mpsse_close(self.context)
 		self.context = None
 
 	def ErrorString(self):
 		"""
 		Returns the last libftdi error string.
 		"""
-		return _mpsse.ErrorString(self.context)
+		return _mpsse.mpsse_error_string(self.context)
 
 	def SetMode(self, mode, endianess):
 		"""
@@ -129,7 +129,7 @@ class MPSSE(object):
 		Returns MPSSE_OK on success.
 		Raises an exception on failure.
 		"""
-		if _mpsse.SetMode(self.context, mode, endianess) == MPSSE_FAIL:
+		if _mpsse.mpsse_set_mode(self.context, mode, endianess) == MPSSE_FAIL:
 			raise Exception(self.ErrorString())
 		return MPSSE_OK
 
@@ -142,7 +142,7 @@ class MPSSE(object):
 
 		Returns None.
 		"""
-		_mpsse.EnableBitmode(self.context, tf)
+		_mpsse.mpsse_enable_bitmode(self.context, tf)
 
 	def FlushAfterRead(self, tf):
 		"""
@@ -152,7 +152,7 @@ class MPSSE(object):
 
 		Returns None.
 		"""
-		return _mpsse.FlushAfterRead(self.context, tf)
+		return _mpsse.mpsse_flush_after_read(self.context, tf)
 
 	def SetClock(self, frequency):
 		"""
@@ -164,7 +164,7 @@ class MPSSE(object):
 		Returns MPSSE_OK on success.
 		Raises an exception on failure.
 		"""
-		if _mpsse.SetClock(self.context, frequency) == MPSSE_FAIL:
+		if _mpsse.mpsse_set_clock(self.context, frequency) == MPSSE_FAIL:
 			raise Exception(self.ErrorString())
 		return MPSSE_OK
 
@@ -172,26 +172,26 @@ class MPSSE(object):
 		"""
 		Returns the currently configured clock rate, in hertz.
 		"""
-		return _mpsse.GetClock(self.context)
+		return _mpsse.mpsse_get_clock(self.context)
 
 	def GetVid(self):
 		"""
 		Returns the vendor ID of the FTDI chip.
 		"""
-		return _mpsse.GetVid(self.context)
+		return _mpsse.mpsse_get_vid(self.context)
 
 	def GetPid(self):
 		"""
 		Returns the product ID of the FTDI chip.
 		"""
-		return _mpsse.GetPid(self.context)
+		return _mpsse.mpsse_get_pid(self.context)
 
 	def GetDescription(self):
 		"""
 		Returns the description of the FTDI chip, if any.
 		This will only be populated if __init__ was used to open the device.
 		"""
-		return _mpsse.GetDescription(self.context)
+		return _mpsse.mpsse_get_description(self.context)
 
 	def SetLoopback(self, enable):
 		"""
@@ -202,7 +202,7 @@ class MPSSE(object):
 		Returns MPSSE_OK on success.
 		Raises an exception on failure.
 		"""
-		if _mpsse.SetLoopback(self.context, enable) == MPSSE_FAIL:
+		if _mpsse.mpsse_set_loopback(self.context, enable) == MPSSE_FAIL:
 			raise Exception(self.ErrorString())
 		return MPSSE_OK
 
@@ -214,7 +214,7 @@ class MPSSE(object):
 
 		Returns None.
 		"""
-		_mpsse.SetCSIdle(self.context, idle)
+		_mpsse.mpsse_set_cs_idle(self.context, idle)
 
 	def Start(self):
 		"""
@@ -223,7 +223,7 @@ class MPSSE(object):
 		Returns MPSSE_OK on success.
 		Raises an exception on failure.
 		"""
-		if _mpsse.Start(self.context) == MPSSE_FAIL:
+		if _mpsse.mpsse_start(self.context) == MPSSE_FAIL:
 			raise Exception(self.ErrorString())
 		return MPSSE_OK
 
@@ -247,7 +247,7 @@ class MPSSE(object):
 		Returns MPSSE_OK on success.
 		Raises an exception on failure.
 		"""
-		if _mpsse.Write(self.context, data) == MPSSE_FAIL:
+		if _mpsse.mpsse_write(self.context, data) == MPSSE_FAIL:
 			raise Exception(self.ErrorString())
 		return MPSSE_OK
 
@@ -259,7 +259,7 @@ class MPSSE(object):
 
 		Returns a string of size bytes.
 		"""
-		return _mpsse.Read(self.context, size)
+		return _mpsse.mpsse_read(self.context, size)
 
 	def Transfer(self, data):
 		"""
@@ -270,7 +270,7 @@ class MPSSE(object):
 
 		Returns a string of len(data) bytes.
 		"""
-		return _mpsse.Transfer(self.context, data)
+		return _mpsse.mpsse_transfer(self.context, data)
 
 	def SetAck(self, ack):
 		"""
@@ -281,7 +281,7 @@ class MPSSE(object):
 
 		Returns None.
 		"""
-		_mpsse.SetAck(self.context, ack)
+		_mpsse.mpsse_set_ack(self.context, ack)
 
 	def SendAcks(self):
 		"""
@@ -289,7 +289,7 @@ class MPSSE(object):
 
 		Returns None.
 		"""
-		_mpsse.SendAcks(self.context)
+		_mpsse.mpsse_send_acks(self.context)
 
 	def SendNacks(self):
 		"""
@@ -297,7 +297,7 @@ class MPSSE(object):
 
 		Returns None.
 		"""
-		return _mpsse.SendNacks(self.context)
+		return _mpsse.mpsse_send_nacks(self.context)
 
 	def GetAck(self):
 		"""
@@ -305,7 +305,7 @@ class MPSSE(object):
 
 		Returns one of: ACK, NACK.
 		"""
-		return _mpsse.GetAck(self.context)
+		return _mpsse.mpsse_get_ack(self.context)
 
 	def PinHigh(self, pin):
 		"""
@@ -317,7 +317,7 @@ class MPSSE(object):
 		Returns MPSSE_OK on success.
 		Raises an exception on failure.
 		"""
-		if _mpsse.PinHigh(self.context, pin) == MPSSE_FAIL:
+		if _mpsse.mpsse_pin_high(self.context, pin) == MPSSE_FAIL:
 			raise Exception(self.ErrorString())
 		return MPSSE_OK
 
@@ -331,7 +331,7 @@ class MPSSE(object):
 		Returns MPSSE_OK on success.
 		Raises an exception on failure.
 		"""
-		if _mpsse.PinLow(self.context, pin) == MPSSE_FAIL:
+		if _mpsse.mpsse_pin_low(self.context, pin) == MPSSE_FAIL:
 			raise Exception(self.ErrorString())
 		return MPSSE_OK
 
@@ -345,7 +345,7 @@ class MPSSE(object):
 		Returns MPSSE_OK on success.
 		Raises an exception on failure.
 		"""
-		if _mpsse.SetDirection(self.context, direction) == MPSSE_FAIL:
+		if _mpsse.mpsse_set_direction(self.context, direction) == MPSSE_FAIL:
 			raise Exception(self.ErrorString())
 		return MPSSE_OK
 
@@ -359,7 +359,7 @@ class MPSSE(object):
 		Returns MPSSE_OK on success.
 		Raises an exception on failure.
 		"""
-		if _mpsse.WriteBits(self.context, bits, n) == MPSSE_FAIL:
+		if _mpsse.mpsse_write_bits(self.context, bits, n) == MPSSE_FAIL:
 			raise Exception(self.ErrorString())
 		return MPSSE_OK
 
@@ -371,7 +371,7 @@ class MPSSE(object):
 
 		Returns an integer value with the read bits set.
 		"""
-		return ord(_mpsse.ReadBits(self.context, n))
+		return ord(_mpsse.mpsse_read_bits(self.context, n))
 
 	def WritePins(self, data):
 		"""
@@ -383,7 +383,7 @@ class MPSSE(object):
 		Returns MPSSE_OK on success.
 		Raises an exception on failure.
 		"""
-		if _mpsse.WritePins(self.context, data) == MPSSE_FAIL:
+		if _mpsse.mpsse_write_pins(self.context, data) == MPSSE_FAIL:
 			raise Exception(self.ErrorString())
 		return MPSSE_OK
 
@@ -394,7 +394,7 @@ class MPSSE(object):
 
 		Returns an integer with the corresponding pin's bits set.
 		"""
-		return _mpsse.ReadPins(self.context)
+		return _mpsse.mpsse_read_pins(self.context)
 
 	def PinState(self, pin, state=-1):
 		"""
@@ -406,17 +406,17 @@ class MPSSE(object):
 
 		Returns a 1 if the pin is high, 0 if the pin is low.
 		"""
-		return _mpsse.PinState(self.context, pin, state)
+		return _mpsse.mpsse_pin_state(self.context, pin, state)
 
 	def Tristate(self):
 		"""
 		Puts all I/O pins into a tristate mode (FT232H only).
 		"""
-		return _mpsse.Tristate(self.context)
+		return _mpsse.mpsse_tristate(self.context)
 
 	def Version(self):
 		"""
 		Returns the libmpsse version number.
 		High nibble is major, low nibble is minor.
 		"""
-		return _mpsse.Version()
+		return _mpsse.mpsse_version()

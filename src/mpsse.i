@@ -1,7 +1,7 @@
 %module pylibmpsse
 %include "stdint.i"
 %{
-#include "mpsse.h"
+#include "../../../../src/mpsse.h"
 %}
 
 %typemap(in) (char *data, int size)
@@ -22,4 +22,5 @@
         free($1.data);
 }
 
-%include "mpsse.h"
+%include "../../../../src/mpsse.h"
+

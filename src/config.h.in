@@ -1,0 +1,9 @@
+#ifndef CONFIG_H_INCLUDED
+#define CONFIG_H_INCLUDED
+
+#define libmpsse_VERSION "@libmpsse_VERSION@"
+#define libmpsse_VERSION_MAJOR @libmpsse_VERSION_MAJOR@
+#define libmpsse_VERSION_MINOR @libmpsse_VERSION_MINOR@
+#define libmpsse_VERSION_PATCH @libmpsse_VERSION_PATCH@
+
+#endif // CONFIG_H_INCLUDED

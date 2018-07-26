@@ -10,7 +10,7 @@
 #include "mpsse.h"
 #include "support.h"
 
-unsigned char fast_rw_buf[SPI_RW_SIZE + CMD_SIZE];
+unsigned char fast_rw_buf[MPSSE_SPI_RW_SIZE + MPSSE_CMD_SIZE];
 
 /* Builds a block buffer for the Fast* functions. For internal use only. */
 static int fast_build_block_buffer(struct mpsse_context *mpsse, uint8_t cmd, unsigned char *data, size_t size, int *buf_size)
@@ -56,7 +56,7 @@ int FastWrite(struct mpsse_context *mpsse, const char *data, size_t size)
 	int buf_size = 0, txsize = 0;
 	size_t n = 0;
 
-	if(is_valid_context(mpsse))
+	if(mpsse_is_valid_context(mpsse))
 	{
 		if(mpsse->mode)
 		{
@@ -70,7 +70,7 @@ int FastWrite(struct mpsse_context *mpsse, const char *data, size_t size)
 
 				if(fast_build_block_buffer(mpsse, mpsse->tx, (unsigned char *) (data + n), txsize, &buf_size) == MPSSE_OK)
 				{
-					if(raw_write(mpsse, fast_rw_buf, buf_size) == MPSSE_OK)
+					if(mpsse_raw_write(mpsse, fast_rw_buf, buf_size) == MPSSE_OK)
 					{
 						n += txsize;
 					}
@@ -111,7 +111,7 @@ int FastRead(struct mpsse_context *mpsse, char *data, size_t size)
 	int rxsize = 0, data_size = 0;
 	size_t n = 0;
 
-	if(is_valid_context(mpsse))
+	if(mpsse_is_valid_context(mpsse))
 	{
 		if(mpsse->mode)
 		{
@@ -125,9 +125,9 @@ int FastRead(struct mpsse_context *mpsse, char *data, size_t size)
 
 				if(fast_build_block_buffer(mpsse, mpsse->rx, NULL, rxsize, &data_size) == MPSSE_OK)
 				{
-					if(raw_write(mpsse, fast_rw_buf, data_size) == MPSSE_OK)
+					if(mpsse_raw_write(mpsse, fast_rw_buf, data_size) == MPSSE_OK)
 					{
-						n += raw_read(mpsse, (unsigned char *)(data+n), rxsize);
+						n += mpsse_raw_read(mpsse, (unsigned char *)(data+n), rxsize);
 					}
 					else
 					{
@@ -167,24 +167,24 @@ int FastTransfer(struct mpsse_context *mpsse, const char *wdata, char *rdata, si
 	int data_size = 0, rxsize = 0;
 	size_t n = 0;
 
-	if(is_valid_context(mpsse))
+	if(mpsse_is_valid_context(mpsse))
 	{
-		if(mpsse->mode >= SPI0 && mpsse->mode <= SPI3)
+		if(mpsse->mode >= MPSSE_SPI0 && mpsse->mode <= MPSSE_SPI3)
 		{
 			while(n < size)
 			{
 				rxsize = size - n;
 				/* When sending and recieving, FTDI chips don't seem to like large data blocks. Limit the size of each block to SPI_TRANSFER_SIZE */
-				if(rxsize > SPI_TRANSFER_SIZE)
+				if(rxsize > MPSSE_SPI_TRANSFER_SIZE)
 				{
-					rxsize = SPI_TRANSFER_SIZE;
+					rxsize = MPSSE_SPI_TRANSFER_SIZE;
 				}
 
 				if(fast_build_block_buffer(mpsse, mpsse->txrx, (unsigned char *) (wdata + n), rxsize, &data_size) == MPSSE_OK)
 				{
-					if(raw_write(mpsse, fast_rw_buf, data_size) == MPSSE_OK)
+					if(mpsse_raw_write(mpsse, fast_rw_buf, data_size) == MPSSE_OK)
 					{
-						n += raw_read(mpsse, (unsigned char *)(rdata + n), rxsize);
+						n += mpsse_raw_read(mpsse, (unsigned char *)(rdata + n), rxsize);
 					}
 					else
 					{
